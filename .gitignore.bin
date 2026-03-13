@@ -1,0 +1,24 @@
+# Ambientes virtuais (Python)
+venv/
+env/
+.env
+
+# Arquivos temporários do Python
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Pesos e Modelos (O MAIS IMPORTANTE)
+# Aqui estamos ignorando extensões comuns de modelos de IA
+*.pth
+*.bin
+*.onnx
+*.ckpt
+*.safetensors
+models/
+weights/
+
+# Logs e arquivos de sistema
+*.log
+.DS_Store
+Thumbs.db

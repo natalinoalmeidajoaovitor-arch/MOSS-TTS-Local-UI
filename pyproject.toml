@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moss-tts"
+version = "0.1.0"
+description = "MOSS-TTS dependencies and utilities"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "OpenMOSS Team" }]
+dependencies = [
+  "torch==2.9.1+cu128",
+  "torchaudio==2.9.1+cu128",
+  "torchcodec===0.8.1",
+  "transformers==5.0.0",
+  "safetensors==0.6.2",
+  "numpy==2.1.0",
+  "orjson==3.11.4",
+  "tqdm==4.67.1",
+  "PyYAML==6.0.3",
+  "einops==0.8.1",
+  "scipy==1.16.2",
+  "librosa==0.11.0",
+  "tiktoken==0.12.0",
+  "psutil",
+  "packaging",
+  "ninja",
+  "setuptools",
+  "wheel",
+  "gradio"
+]
+
+[project.optional-dependencies]
+flash-attn = ["flash-attn"]
+
+[project.urls]
+Homepage = "https://github.com/OpenMOSS-Team/MOSS-TTS"
+Repository = "https://github.com/OpenMOSS-Team/MOSS-TTS"
+
+[tool.setuptools]
+py-modules = []
