@@ -1,5 +1,12 @@
 import os
-os.add_dll_directory(r"C:\Users\jv\MOSS-TTS")
+import sys
+
+# Detecta automaticamente a pasta onde este script (app.py) está salvo
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Adiciona o diretório de DLLs de forma dinâmica para funcionar em qualquer PC
+if sys.platform == 'win32':
+    os.add_dll_directory(ROOT_DIR)
 
 import torch
 import torchaudio
@@ -36,8 +43,8 @@ processor = None
 device = "cuda" if torch.cuda.is_available() else "cpu"
 dtype = torch.float16 if device == "cuda" else torch.float32
 
-# CAMINHO CORRIGIDO: Usando barras normais (/) para evitar o bug de Repo ID no Windows
-MODEL_PATH = "C:/Users/jv/MOSS-TTS/moss_model"
+# CAMINHO DINÂMICO: Agora ele aponta para a pasta 'moss_model' dentro do projeto, independente do PC
+MODEL_PATH = os.path.join(ROOT_DIR, "moss_model").replace("\\", "/")
 
 def cleanup_model():
     """Unload model from GPU memory"""
@@ -68,7 +75,7 @@ def load_model():
     global model, processor
 
     if model is None:
-        print("🔄 Loading MOSS-TTS from local folder...")
+        print(f"🔄 Loading MOSS-TTS from: {MODEL_PATH}")
 
         attn_implementation = resolve_attn_implementation()
         print(f"Using attention: {attn_implementation}")
@@ -182,7 +189,8 @@ def generate_speech(
         return None, "⚠️ Please enter text!"
 
     try:
-        os.makedirs("outputs", exist_ok=True)
+        # Cria a pasta outputs dinamicamente na raiz do projeto
+        os.makedirs(os.path.join(ROOT_DIR, "outputs"), exist_ok=True)
 
         progress(0, desc="Loading model...")
         model, processor = load_model()
@@ -307,7 +315,9 @@ def generate_speech(
 
         # Save
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = f"outputs/moss_tts_{timestamp}.wav"
+        output_filename = f"moss_tts_{timestamp}.wav"
+        output_path = os.path.join(ROOT_DIR, "outputs", output_filename)
+        
         torchaudio.save(
             output_path,
             audio.unsqueeze(0),
@@ -349,30 +359,62 @@ def generate_speech(
 
 custom_css = """
 .aiquest-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #7e22ce 100%);
+    padding: 25px;
     border-radius: 12px;
     margin-bottom: 16px;
     text-align: center;
     color: white;
 }
 .aiquest-header h1 {
-    margin: 0 0 8px 0;
-    font-size: 1.8em;
+    margin: 0 0 10px 0;
+    font-size: 2.2em;
+    font-weight: 800;
     color: white !important;
 }
 .aiquest-header p {
     margin: 4px 0;
-    opacity: 0.95;
+    font-size: 1.1em;
+    opacity: 0.9;
     color: white !important;
+}
+.social-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.social-links a {
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+.social-links a:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
 }
 """
 
 with gr.Blocks(title="MOSS-TTS Local", theme=gr.themes.Soft(), css=custom_css) as demo:
-    gr.HTML("""
+    gr.HTML(f"""
     <div class="aiquest-header">
-        <h1>🎙️ MOSS-TTS 1.7B Zero-Shot Voice Cloning (LOCAL)</h1>
-        <p>Rodando offline na sua máquina</p>
+        <h1>🎙️ MOSS-TTS 1.7B Local - Desenvolvido por João Vitor Natalino</h1>
+        <p>Interface de Clonagem de Voz Zero-Shot de Alta Fidelidade</p>
+        <div class="social-links">
+            <a href="https://www.linkedin.com/in/jo%C3%A3o-vitor-natalino-almeida-3aa37a189/" target="_blank">
+                🔗 LinkedIn
+            </a>
+            <a href="https://www.instagram.com/joaovitor.fooh/" target="_blank">
+                📸 Instagram
+            </a>
+        </div>
     </div>
     """)
 
